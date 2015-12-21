@@ -31,7 +31,7 @@ class SString{
         friend SString operator +(const SString &s1,const SString &s2);
         friend SString operator +=(const SString &s1,const SString &s2);
         friend ostream & operator <<(ostream & os,const SString &s);
-        friend istream & operator >>(istream & is,const SString &s);
+        friend istream & operator >>(istream & is,SString &s);
 
 };
 
@@ -65,13 +65,15 @@ int & SString::size(){
 int SString::find(const SString &s){
     int *nex=new int[s.len];
     nex[0]=0;
-    for(int i=0,j;i<s.len;){
+    for(int i=0,j=0;i<s.len;){
         j=nex[i];
         while(j&&s.str[i]!=s.str[j])
             j=nex[j];
-        nex[++i]=(s.str[i]==s.str[j]?j+1:0);
+        if(s.str[i]==s.str[j])
+            nex[++i]=j+1;
+        else
+            nex[++i]=0;
     }
-
     int pos=npos;
     for(int i=0,j=0;i<len;){
         if(str[i]==s.str[j]){
@@ -95,7 +97,10 @@ void SString::replace(const SString &s,const SString &re){
         j=nex[i];
         while(j&&s.str[i]!=s.str[j])
             j=nex[j];
-        nex[++i]=(s.str[i]==s.str[j]?j+1:0);
+        if(s.str[i]==s.str[j])
+            nex[++i]=j+1;
+        else
+            nex[++i]=0;
     }
 
     int length=0;
@@ -112,9 +117,9 @@ void SString::replace(const SString &s,const SString &re){
                 j=0;
             }
         }
-        else{
+        else
             j?j=nex[j]:tt[length++]=str[i++];
-        }
+
     }
     len=length;
     delete [] str;
@@ -188,11 +193,27 @@ ostream & operator <<(ostream & os,const SString &s){
     return os;
 }
 
-istream & operator >>(istream & is,const SString &s){
+istream & operator >>(istream & is,SString &s){
     is>>s.str;
+    s.len = strlen(s.str);
     return is;
 }
 
 int main(){
+    SString s1,s2,s3;
+    cin>>s1>>s2;
+    cout<<"s1="<<s1<<endl;
+    cout<<"s2="<<s2<<endl;
+    if(s1==s2)
+        cout<<"s1==s2"<<endl;
+    else
+        cout<<"s1!=s2"<<endl;
+    cout<<"s2= ";
+    cin>>s2;
+    cout<<"The position of s2 in si: "<<s1.find(s2)+1<<endl;
+    cout<<"s3= ";
+    cin>>s3;
+    s1.replace(s2,s3);
+    cout<<"replace s2 in s1 with s3: "<<s1<<endl;
     return 0;
 }
